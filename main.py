@@ -6,11 +6,8 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 from sentence_transformers import SentenceTransformer, util
 
 def info_rele(df):
-    """
-    Crea una nueva columna en el DataFrame que combina el nombre del director y el valor ganado
-    de la película para proporcionar más contexto.
-    """
-    # Asegúrate de que las columnas 'Cast' y 'Info' existan en el DataFrame antes de usarlas
+
+    # Nueva columna en el DataFrame que combina el nombre del director y el valor ganado de la película para proporcionar más contexto
     df['informacion_relevante'] = df.apply(lambda row: f"Director: {row['Cast']}, Valor ganado: {row['Info']}", axis=1)
     return df
 
@@ -21,21 +18,21 @@ def main():
 
     # Crear una nueva columna con información relevante (sin cambiar la búsqueda)
     df = info_rele(df)
-    # print(df[['Title', 'informacion_relevante']].head())  # Mostrar algunas filas de la nueva columna
-
+    
     # Cargar el modelo de Sentence Transformer
     model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
+    #Ciclo para continuar las consultas
     while True:
         query = input('Ingresa el término de búsqueda (o escribe "salir" para terminar): ')
         if query.lower() == 'salir':
             print("Saliendo del programa. ¡Hasta luego!")
             break
 
-        # Crear embeddings para los títulos o descripciones (ajusta la columna según el dataset)
+        # Crea embeddings para las descripciones
         embeddings = model.encode(df['Description'].tolist(), show_progress_bar=True)
 
-        # Crear embeddings para la consulta
+        # Crea embeddings para la consulta
         query_embedding = model.encode(query)
 
         # Calcular la similitud coseno entre la consulta y los embeddings de los títulos
